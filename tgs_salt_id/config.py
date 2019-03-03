@@ -1,5 +1,8 @@
 PTH_TRAIN_IMGS = 'data/train/images'
 PTH_TRAIN_MASKS = 'data/train/masks'
+PTH_TEST_IMAGES = 'data/test/images'
+
+PTH_CHECKPOINTS = 'checkpoints/'
 
 IMG_SIZE = 128
 

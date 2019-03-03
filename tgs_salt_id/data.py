@@ -33,9 +33,25 @@ def load_data(target_size):
     return images, masks, depths
 
 
-if __name__ == '__main__':
+def load_test_images(target_size):
+    files, paths = get_files_from_dir(PTH_TEST_IMAGES)
+    images = [
+        cv2.resize(
+            cv2.imread(path, cv2.IMREAD_GRAYSCALE),
+            target_size
+        ).astype(np.float32) / 255 for path in paths]
+    images = np.reshape(images, (-1, *target_size, 1))
+
+    return files, images
+
+
+def do_main():
     images, masks, depths = load_data((128, 128))
     for img, msk, d in zip(images, masks, depths):
         print('Depth: {}'.format(d))
         utils.named_window(img, 'Image', (640, 640), False)
         utils.named_window(msk, 'Mask', (640, 640), True)
+
+
+if __name__ == '__main__':
+    do_main()

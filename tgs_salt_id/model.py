@@ -77,4 +77,4 @@ def get_model(in_w, in_h, n_filters=16, dropout=0.5, batch_norm=True):
 
 
 if __name__ == '__main__':
-    model = get_model(128, 128)
+    model = get_model(96, 96)
