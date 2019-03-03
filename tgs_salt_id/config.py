@@ -4,6 +4,8 @@ PTH_TEST_IMAGES = 'data/test/images'
 
 PTH_CHECKPOINTS = 'checkpoints/'
 
+PTH_MASKS = 'outputs/masks'
+
 IMG_SIZE = 128
 
 EPOCHS = 100

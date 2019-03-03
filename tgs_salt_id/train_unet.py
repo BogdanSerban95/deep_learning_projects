@@ -29,7 +29,7 @@ def get_callbacks():
 def get_generators(X_train, y_train):
     augmentations = dict(horizontal_flip=True,
                          vertical_flip=True,
-              		 rotation_range=15,
+                         rotation_range=15,
                          fill_mode='constant',
                          cval=0,
                          zoom_range=0.05)
