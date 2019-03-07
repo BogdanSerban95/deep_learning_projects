@@ -8,13 +8,13 @@ from model import get_model
 from data import load_test_images
 from progressbar import ProgressBar
 
-MODEL_NAME = 'model_tgs_salt.h5'
-OUT_DIR = 'outputs'
-OUT_FILE = 'outputs.csv'
+MODEL_NAME = 'unet_32/model_tgs_salt.h5'
+OUT_DIR = 'outputs_32'
+OUT_FILE = 'outputs_32.csv'
 ORIG_IMG_SIZE = 101
 
-DO_OPEN = False
-SAVE_MASKS = False
+DO_OPEN = True
+SAVE_MASKS =False
 
 
 def get_rle_mask(mask):
@@ -62,15 +62,17 @@ def save_rle_masks():
 def save_masks():
     names, images = load_test_images((128, 128))
     print('Loading model...')
-    model = load_model(join(PTH_CHECKPOINTS, MODEL_NAME))
+    model_name = join(PTH_CHECKPOINTS, MODEL_NAME)
+    print(model_name)
+    model = load_model(model_name)
 
-    temp_model = get_model(128, 128)
+    temp_model = get_model(128, 128, n_filters=32, dropout=0.0)
     temp_model.set_weights(model.get_weights())
     print('Done.')
 
     mask_preds = temp_model.predict(images[:], verbose=1, batch_size=64)
     mask_preds = [
-        cv2.normalize(cv2.resize(cv2.threshold(mask, 0.3, 255, cv2.THRESH_BINARY)[1], (ORIG_IMG_SIZE, ORIG_IMG_SIZE)),
+        cv2.normalize(cv2.resize(mask, (ORIG_IMG_SIZE, ORIG_IMG_SIZE)),
                       None, 0, 255, cv2.NORM_MINMAX, cv2.CV_8UC1) for mask in mask_preds]
     if DO_OPEN:
         print('Performing morphological opening...', end='\r')
@@ -78,9 +80,10 @@ def save_masks():
         mask_preds = [cv2.morphologyEx(pred, cv2.MORPH_OPEN, op) for pred in mask_preds]
         print('Done.')
     print('Saving masks...')
-    utils.ensure_dir(PTH_MASKS)
+    out = join(OUT_DIR, PTH_MASKS)
+    utils.ensure_dir(out)
     for name, mask in zip(names, mask_preds):
-        cv2.imwrite(join(PTH_MASKS, name), mask)
+        cv2.imwrite(join(out, name), mask)
 
 
 def do_main():

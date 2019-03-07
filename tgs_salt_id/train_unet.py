@@ -8,19 +8,20 @@ import numpy as np
 from utils import ensure_dir
 from keras.preprocessing.image import ImageDataGenerator
 
-CKPT_DIR = './checkpoints'
-LOG_DIR = './logs'
+mdl_name = 'unet_16_v2'
+CKPT_DIR = 'checkpoints/{}'.format(mdl_name)
+LOG_DIR = 'logs/{}'.format(mdl_name)
 
 
 def get_callbacks():
     return [
-        EarlyStopping(patience=10, verbose=1),
-        ReduceLROnPlateau(factor=0.1, patience=3, min_lr=1e-6, verbose=1),
-        ModelCheckpoint('checkpoints/model_tgs_salt.h5', verbose=1, save_best_only=True),
+        EarlyStopping(patience=20, verbose=1),
+        ReduceLROnPlateau(factor=0.1, patience=8, min_lr=1e-6, verbose=1),
+        ModelCheckpoint('{}/model_tgs_salt.h5'.format(CKPT_DIR), verbose=1, save_best_only=True),
         TensorBoard(
             log_dir=LOG_DIR,
             histogram_freq=0,
-            write_images=True,
+            write_images=False,
             update_freq='epoch'
         )
     ]
@@ -28,11 +29,7 @@ def get_callbacks():
 
 def get_generators(X_train, y_train):
     augmentations = dict(horizontal_flip=True,
-                         vertical_flip=True,
-                         rotation_range=15,
-                         fill_mode='constant',
-                         cval=0,
-                         zoom_range=0.05)
+                         vertical_flip=True)
     images_data_generator = ImageDataGenerator(**augmentations)
     masks_data_generator = ImageDataGenerator(**augmentations)
 
@@ -62,7 +59,7 @@ def do_main():
     X, y, d = data.load_data((IMG_SIZE, IMG_SIZE))
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.15)
     print(X_train.shape, X_test.shape, y_train.shape, y_test.shape)
-    model = get_model(IMG_SIZE, IMG_SIZE, n_filters=16, dropout=0.0, batch_norm=True)
+    model = get_model(IMG_SIZE, IMG_SIZE, n_filters=16, dropout=0.25, batch_norm=True)
 
     train_gen = get_generators(X_train, y_train)
 
