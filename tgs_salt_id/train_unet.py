@@ -59,8 +59,9 @@ def parse_args():
                         help='Number of starting convolution filters')
     parser.add_argument('-dropout', metavar='D', type=float, default=0.25,
                         help='Dropout value')
-    parser.add_argument('-b_norm', metavar='B', type=bool, default=True,
-                        help='Use or not batch normalization')
+    parser.add_argument('-b_norm', dest='b_norm', action='store_true')
+    parser.add_argument('-no_b_norm', dest='b_norm', action='store_false')
+    parser.set_defaults(b_norm=True)
     parser.add_argument('-ckpt_fld', type=str, default='model',
                         help='Name of the checkpoint subfolder')
 
@@ -71,6 +72,7 @@ def parse_args():
 def do_main():
     global CKPT_DIR, LOG_DIR
     args = parse_args()
+    print(args)
     CKPT_DIR = 'checkpoints/{}'.format(args.ckpt_fld)
     LOG_DIR = 'logs/{}'.format(args.ckpt_fld)
 
