@@ -29,14 +29,15 @@ def get_callbacks():
 
 def get_generators(X_train, y_train):
     augmentations = dict(horizontal_flip=True,
-                         vertical_flip=True)
+                         vertical_flip=True,
+                         rotation_range=45,
+                         zoom_range=[0.75, 1.25])
     images_data_generator = ImageDataGenerator(**augmentations)
     masks_data_generator = ImageDataGenerator(**augmentations)
 
     random_state = 101
-    return zip(images_data_generator.flow(X_train, seed=random_state, batch_size=BATCH_SIZE,
-                                          shuffle=True), masks_data_generator.flow(y_train, seed=random_state,
-                                                                                   batch_size=BATCH_SIZE, shuffle=True))
+    return zip(images_data_generator.flow(X_train, seed=random_state, batch_size=BATCH_SIZE, shuffle=True),
+               masks_data_generator.flow(y_train, seed=random_state, batch_size=BATCH_SIZE, shuffle=True))
 
 
 def do_plot(results):
