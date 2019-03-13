@@ -8,5 +8,5 @@ PTH_MASKS = 'outputs/masks'
 
 IMG_SIZE = 96
 
-EPOCHS = 100
+EPOCHS = 200
 BATCH_SIZE = 64
