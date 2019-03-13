@@ -8,7 +8,7 @@ def ensure_dir(path):
 
 
 def get_files_from_dir(dir_path, include_paths=True):
-    print('Reading {}...'.format(dir_path))
+    print('Discovering: {}...'.format(dir_path), end='\r')
     files = os.listdir(dir_path)
     files = list(filter(lambda x: os.path.isfile(os.path.join(dir_path, x)), files))
     print('Found {} files.'.format(len(files)))

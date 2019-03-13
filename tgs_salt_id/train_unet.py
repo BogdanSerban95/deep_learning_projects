@@ -7,17 +7,17 @@ import matplotlib.pyplot as plt
 import numpy as np
 from utils import ensure_dir
 from keras.preprocessing.image import ImageDataGenerator
+import argparse
 
-mdl_name = 'unet_16_v2'
-CKPT_DIR = 'checkpoints/{}'.format(mdl_name)
-LOG_DIR = 'logs/{}'.format(mdl_name)
+CKPT_DIR = 'checkpoints/unet'
+LOG_DIR = 'logs/unet'
 
 
 def get_callbacks():
     return [
         EarlyStopping(patience=20, verbose=1),
         ReduceLROnPlateau(factor=0.1, patience=8, min_lr=1e-6, verbose=1),
-        ModelCheckpoint('{}/model_tgs_salt.h5'.format(CKPT_DIR), verbose=1, save_best_only=True),
+        ModelCheckpoint('{}/model.h5'.format(CKPT_DIR), verbose=1, save_best_only=True),
         TensorBoard(
             log_dir=LOG_DIR,
             histogram_freq=0,
@@ -52,14 +52,35 @@ def do_plot(results):
     plt.show()
 
 
+def parse_args():
+    parser = argparse.ArgumentParser(description='Train script for U-Net model.')
+    parser.add_argument('-n_filters', metavar='N', type=int, default=16,
+                        help='Number of starting convolution filters')
+    parser.add_argument('-dropout', metavar='D', type=float, default=0.25,
+                        help='Dropout value')
+    parser.add_argument('-b_norm', metavar='B', type=bool, default=True,
+                        help='Use or not batch normalization')
+    parser.add_argument('-ckpt_fld', type=str, default='model',
+                        help='Name of the checkpoint subfolder')
+
+    args = parser.parse_args()
+    return args
+
+
 def do_main():
+    global CKPT_DIR, LOG_DIR
+    args = parse_args()
+    CKPT_DIR = 'checkpoints/{}'.format(args.ckpt_fld)
+    LOG_DIR = 'logs/{}'.format(args.ckpt_fld)
+
     ensure_dir(CKPT_DIR)
     ensure_dir(LOG_DIR)
 
     X, y, d = data.load_data((IMG_SIZE, IMG_SIZE))
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.15)
-    print(X_train.shape, X_test.shape, y_train.shape, y_test.shape)
-    model = get_model(IMG_SIZE, IMG_SIZE, n_filters=16, dropout=0.25, batch_norm=True)
+
+    # Use the same random state to have the same train/test split
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.15, random_state=101)
+    model = get_model(IMG_SIZE, IMG_SIZE, n_filters=args.n_filters, dropout=args.dropout, batch_norm=True)
 
     train_gen = get_generators(X_train, y_train)
 

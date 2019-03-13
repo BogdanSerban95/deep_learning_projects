@@ -6,7 +6,7 @@ PTH_CHECKPOINTS = 'checkpoints/'
 
 PTH_MASKS = 'outputs/masks'
 
-IMG_SIZE = 128
+IMG_SIZE = 96
 
 EPOCHS = 100
-BATCH_SIZE = 32
+BATCH_SIZE = 64

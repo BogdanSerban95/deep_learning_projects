@@ -9,6 +9,7 @@ from utils import get_files_from_dir
 
 def load_data(target_size):
     files, paths = get_files_from_dir(PTH_TRAIN_IMGS)
+    print('Reading images...', end='\r')
     images = [
         cv2.resize(
             cv2.imread(path, cv2.IMREAD_GRAYSCALE),
@@ -29,7 +30,7 @@ def load_data(target_size):
         dict_depths[row['id']] = row['z']
     # dict_depths = {i[0]: i[1] for i in df_depths.iterrows()}
     depths = [dict_depths[file.split('.')[0]] for file in files]
-
+    print('Done.')
     return images, masks, depths
 
 

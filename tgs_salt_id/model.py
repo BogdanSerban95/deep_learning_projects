@@ -2,6 +2,7 @@ from keras.layers import *
 from keras.optimizers import Adam
 from keras.losses import binary_crossentropy
 from keras.models import Model
+from custom_metric import comp_metric
 
 
 def conv2d_block(input_tensor, n_filters, k_size=3, batch_norm=True):
@@ -13,8 +14,8 @@ def conv2d_block(input_tensor, n_filters, k_size=3, batch_norm=True):
     )(input_tensor)
     if batch_norm:
         x = BatchNormalization()(x)
-
-    x = Activation('relu')(x)
+    # x = Activation('relu')(x)
+    x = LeakyReLU()(x)
     x = Conv2D(
         filters=n_filters,
         kernel_size=(k_size, k_size),
@@ -23,7 +24,8 @@ def conv2d_block(input_tensor, n_filters, k_size=3, batch_norm=True):
     )(x)
     if batch_norm:
         x = BatchNormalization()(x)
-    x = Activation('relu')(x)
+    # x = Activation('relu')(x)
+    x = LeakyReLU()(x)
 
     return x
 
@@ -32,7 +34,7 @@ def get_model(in_w, in_h, n_filters=16, dropout=0.5, batch_norm=True):
     input = Input((in_h, in_w, 1), name="input_layer")
     c1 = conv2d_block(input, n_filters=n_filters, k_size=3, batch_norm=batch_norm)
     p1 = MaxPooling2D((2, 2))(c1)
-    p1 = Dropout(dropout * 0.5)(p1)
+    p1 = Dropout(dropout)(p1)
 
     c2 = conv2d_block(p1, n_filters=n_filters * 2, k_size=3, batch_norm=batch_norm)
     p2 = MaxPooling2D((2, 2))(c2)
@@ -71,7 +73,7 @@ def get_model(in_w, in_h, n_filters=16, dropout=0.5, batch_norm=True):
     outputs = Conv2D(1, (1, 1), activation='sigmoid')(c9)
 
     model = Model(inputs=[input], outputs=[outputs])
-    model.compile(optimizer=Adam(), loss=binary_crossentropy, metrics=['acc'])
+    model.compile(optimizer=Adam(lr=1e-3, clipvalue=0.01), loss=binary_crossentropy, metrics=['acc', comp_metric])
     model.summary()
     return model
 
