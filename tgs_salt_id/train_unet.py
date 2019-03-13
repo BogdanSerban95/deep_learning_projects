@@ -1,13 +1,13 @@
-from config import *
 import data
-from model import get_model
-from keras.callbacks import EarlyStopping, ReduceLROnPlateau, ModelCheckpoint, TensorBoard
-from sklearn.model_selection import train_test_split
-import matplotlib.pyplot as plt
-import numpy as np
-from utils import ensure_dir
-from keras.preprocessing.image import ImageDataGenerator
 import argparse
+import numpy as np
+from config import *
+from model import get_model
+from utils import ensure_dir
+import matplotlib.pyplot as plt
+from sklearn.model_selection import train_test_split
+from keras.preprocessing.image import ImageDataGenerator
+from keras.callbacks import EarlyStopping, ReduceLROnPlateau, ModelCheckpoint, TensorBoard
 
 CKPT_DIR = 'checkpoints/unet'
 LOG_DIR = 'logs/unet'
@@ -81,7 +81,7 @@ def do_main():
 
     # Use the same random state to have the same train/test split
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.15, random_state=101)
-    model = get_model(IMG_SIZE, IMG_SIZE, n_filters=args.n_filters, dropout=args.dropout, batch_norm=True)
+    model = get_model(IMG_SIZE, IMG_SIZE, n_filters=args.n_filters, dropout=args.dropout, batch_norm=args.b_norm)
 
     train_gen = get_generators(X_train, y_train)
 
