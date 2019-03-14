@@ -3,6 +3,7 @@ from keras.optimizers import Adam
 from keras.losses import binary_crossentropy
 from keras.models import Model
 from custom_metric import comp_metric
+from custom_losses import jaccard_distance_loss
 
 
 def conv2d_block(input_tensor, n_filters, k_size=3, batch_norm=True):
@@ -73,7 +74,7 @@ def get_model(in_w, in_h, n_filters=16, dropout=0.5, batch_norm=True):
     outputs = Conv2D(1, (1, 1), activation='sigmoid')(c9)
 
     model = Model(inputs=[input], outputs=[outputs])
-    model.compile(optimizer=Adam(lr=1e-3, clipvalue=0.01), loss=binary_crossentropy, metrics=['acc', comp_metric])
+    model.compile(optimizer=Adam(lr=1e-3, clipvalue=0.01), loss=jaccard_distance_loss, metrics=['acc', comp_metric])
     model.summary()
     return model
 

@@ -7,14 +7,16 @@ import numpy as np
 from model import get_model
 from data import load_test_images
 from progressbar import ProgressBar
+from custom_metric import comp_metric
+from custom_losses import jaccard_distance_loss
 
-MODEL_NAME = 'unet_32/model_tgs_salt.h5'
-OUT_DIR = 'outputs_32'
-OUT_FILE = 'outputs_32.csv'
+MODEL_NAME = 'unet_16_v2/model.h5'
+OUT_DIR = 'outputs_16'
+OUT_FILE = 'outputs_16_v2.csv'
 ORIG_IMG_SIZE = 101
 
 DO_OPEN = True
-SAVE_MASKS =False
+SAVE_MASKS = True
 
 
 def get_rle_mask(mask):
@@ -60,13 +62,14 @@ def save_rle_masks():
 
 
 def save_masks():
-    names, images = load_test_images((128, 128))
+    names, images = load_test_images((96, 96))
     print('Loading model...')
     model_name = join(PTH_CHECKPOINTS, MODEL_NAME)
     print(model_name)
-    model = load_model(model_name)
+    model = load_model(model_name,
+                       custom_objects={'comp_metric': comp_metric, 'jaccard_distance_loss': jaccard_distance_loss})
 
-    temp_model = get_model(128, 128, n_filters=32, dropout=0.0)
+    temp_model = get_model(96, 96, n_filters=16, dropout=0.0)
     temp_model.set_weights(model.get_weights())
     print('Done.')
 
