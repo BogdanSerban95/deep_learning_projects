@@ -10,13 +10,13 @@ from progressbar import ProgressBar
 from custom_metric import comp_metric
 from custom_losses import jaccard_distance_loss
 
-MODEL_NAME = 'unet_16_v2/model.h5'
-OUT_DIR = 'outputs_16'
-OUT_FILE = 'outputs_16_v2.csv'
+MODEL_NAME = 'unet_16_jacc/model.h5'
+OUT_DIR = 'outputs_16_jacc'
+OUT_FILE = 'outputs_16_jacc.csv'
 ORIG_IMG_SIZE = 101
 
 DO_OPEN = True
-SAVE_MASKS = True
+SAVE_MASKS = False
 
 
 def get_rle_mask(mask):
@@ -38,7 +38,7 @@ def get_rle_mask(mask):
             out.append(non_zero[i])
             start_px = non_zero[i]
 
-    if len(out) & 2 != 1:
+    if len(out) % 2 != 0:
         out.append(non_zero[num_non_zero - 1] - start_px + 1)
     assert len(out) % 2 == 0
     return np.array(out)
