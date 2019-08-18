@@ -21,15 +21,17 @@ class LoaderWorker(multiprocessing.Process):
 
 
 class BaseDataLoader(object):
-    def __init__(self, num_workers, worker_func, worker_func_args):
+    def __init__(self, num_workers, worker_func, worker_func_args, limit):
         self.queue = multiprocessing.Queue(MAX_QUEUE_SIZE)
         self.workers = []
+        self.limit = limit
+
         for i in range(num_workers):
             self.workers.append(LoaderWorker(queue=self.queue, worker_func=worker_func, fn_args=worker_func_args))
             self.workers[i].start()
 
-    def get_next_batch(self, batch_size):
-        for i in range(batch_size):
+    def get_next_batch(self):
+        for i in range(self.limit):
             yield self.queue.get(True)
 
     def stop_all(self):
