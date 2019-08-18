@@ -2,12 +2,12 @@ import rectangle_detection.utils as utils
 from rectangle_detection.config import *
 from rectangle_detection.config import *
 from rectangle_detection.data_loaders import BaseDataLoader
-
+from rectangle_detection.image_augmenter import seq
 import cv2
 import numpy as np
 
 
-def rand_square_im_worker_fun(queue, im_size, sq_size_range):
+def rand_square_im_worker_fun(queue, im_size, sq_size_range, augment=False):
     while True:
         batch_x = []
         batch_y = []
@@ -32,13 +32,18 @@ def rand_square_im_worker_fun(queue, im_size, sq_size_range):
             cv2.rectangle(img, (tl_x, tl_y), (tl_x + sq_width, tl_y + sq_height),
                           np.random.uniform(in_color - 0.1, 1.0),
                           np.random.randint(1, 3))
+
         batch_x = np.array(batch_x, dtype=np.float32)
+        if augment:
+            batch_x = (batch_x * 255).astype(np.uint8)
+            batch_x = seq.augment_images(batch_x)
+            batch_x = batch_x.astype(np.float32) / 255.
         batch_y = np.array(batch_y, dtype=np.float32)
         queue.put((batch_x, batch_y))
 
 
 def do_main():
-    worker_fn_args = {'im_size': (IN_HEIGHT, IN_WIDTH), 'sq_size_range': SQ_SIZE_RANGE}
+    worker_fn_args = {'im_size': (IN_HEIGHT, IN_WIDTH), 'sq_size_range': SQ_SIZE_RANGE, 'augment': True}
     data_loader = BaseDataLoader(num_workers=3, worker_func=rand_square_im_worker_fun, worker_func_args=worker_fn_args,
                                  limit=3)
     for x, y in data_loader.get_next_batch():

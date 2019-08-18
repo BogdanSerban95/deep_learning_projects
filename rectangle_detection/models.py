@@ -21,7 +21,7 @@ def get_model(in_w, in_h):
 
     xo = x
     model = Model(inputs=xi, outputs=xo)
-    optimizer = Adam(lr=1e-3)
+    optimizer = Adam(lr=5e-4)
     model.compile(optimizer=optimizer, loss='mse', metrics=['mse'])
 
     return model

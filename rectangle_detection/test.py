@@ -6,7 +6,7 @@ from rectangle_detection.config import *
 import os.path as osp
 from rectangle_detection.coord_conv import CoordinateChannel2D
 
-CKPT_PATH = osp.join(CHECKPOINTS_FLD, 'sq_reg_v1', 'model-119.h5')
+CKPT_PATH = osp.join(CHECKPOINTS_FLD, 'sq_reg_v1', 'model-240.h5')
 
 
 def get_random_square(im_size, sq_size_range):
@@ -39,27 +39,28 @@ def eval_random_images():
 
 def eval_real_image():
     model = load_model(CKPT_PATH, custom_objects={'CoordinateChannel2D': CoordinateChannel2D})
-
-    test_img = cv2.imread('./test_images/test_7.jpg', cv2.IMREAD_GRAYSCALE)
-    test_img = cv2.resize(test_img, (IN_WIDTH, IN_HEIGHT))
-    test_img = test_img.astype(np.float32) / 255
-    test_img = np.expand_dims(test_img, axis=0)
-    test_img = np.expand_dims(test_img, axis=-1) if len(test_img.shape) == 3 else test_img
-    preds = model.predict(test_img)[0]
-    print(preds)
-    c_x = int(preds[0] * IN_WIDTH)
-    c_y = int(preds[1] * IN_HEIGHT)
-    r_w = int(preds[2] * IN_WIDTH)
-    r_h = int(preds[3] * IN_HEIGHT)
-    disp_img = test_img[0]
-    cv2.circle(disp_img, (c_x, c_y), 2, (0.5, 0.5, 0.5), 5)
-    cv2.circle(disp_img, (c_x - r_w // 2, c_y - r_h // 2), 2, (0.5, 0.5, 0.5), 5)
-    cv2.circle(disp_img, (c_x + r_w // 2, c_y + r_h // 2), 2, (0.5, 0.5, 0.5), 5)
-    utils.named_window(disp_img, 'Prev', (1024, 768))
+    for i in range(7):
+        test_img = cv2.imread('./test_images/test_{}.jpg'.format(i + 1), cv2.IMREAD_GRAYSCALE)
+        test_img = cv2.resize(test_img, (IN_WIDTH, IN_HEIGHT))
+        test_img = test_img.astype(np.float32) / 255
+        test_img = np.expand_dims(test_img, axis=0)
+        test_img = np.expand_dims(test_img, axis=-1) if len(test_img.shape) == 3 else test_img
+        preds = model.predict(test_img)[0]
+        print(preds)
+        c_x = int(preds[0] * IN_WIDTH)
+        c_y = int(preds[1] * IN_HEIGHT)
+        r_w = int(preds[2] * IN_WIDTH)
+        r_h = int(preds[3] * IN_HEIGHT)
+        disp_img = test_img[0]
+        cv2.circle(disp_img, (c_x, c_y), 2, (0.5, 0.5, 0.5), 5)
+        cv2.circle(disp_img, (c_x - r_w // 2, c_y - r_h // 2), 2, (0.5, 0.5, 0.5), 5)
+        cv2.circle(disp_img, (c_x + r_w // 2, c_y + r_h // 2), 2, (0.5, 0.5, 0.5), 5)
+        utils.named_window(disp_img, 'Prev', (1024, 768))
 
 
 def do_main():
     eval_real_image()
+    # eval_random_images()
 
 
 if __name__ == '__main__':

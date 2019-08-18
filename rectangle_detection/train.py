@@ -12,12 +12,13 @@ CKPT_FLD = osp.join(CHECKPOINTS_FLD, MODEL_NAME)
 def do_main():
     utils.ensure_dir(CKPT_FLD)
     model = models.get_model(IN_WIDTH, IN_HEIGHT)
-    worker_fn_args = {'im_size': (IN_HEIGHT, IN_WIDTH), 'sq_size_range': SQ_SIZE_RANGE}
+    train_worker_fn_args = {'im_size': (IN_HEIGHT, IN_WIDTH), 'sq_size_range': SQ_SIZE_RANGE, 'augment': True}
+    test_worker_fn_args = {'im_size': (IN_HEIGHT, IN_WIDTH), 'sq_size_range': SQ_SIZE_RANGE, 'augment': False}
     train_loader = loaders.BaseDataLoader(num_workers=2, worker_func=worker_functions.rand_square_im_worker_fun,
-                                          worker_func_args=worker_fn_args, limit=TRAIN_STEPS_PER_EPOCH)
+                                          worker_func_args=train_worker_fn_args, limit=TRAIN_STEPS_PER_EPOCH)
 
     test_loader = loaders.BaseDataLoader(num_workers=2, worker_func=worker_functions.rand_square_im_worker_fun,
-                                         worker_func_args=worker_fn_args, limit=TEST_STEPS_PER_EPOCH)
+                                         worker_func_args=test_worker_fn_args, limit=TEST_STEPS_PER_EPOCH)
 
     for epoch in range(EPOCHS):
         print('*' * 10 + 'EPOCH {}'.format(epoch + 1), '*' * 10)
